@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão do Bar</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --sidebar-bg: #1e293b;
+            --accent: #4f46e5;
+            --accent-hover: #4338ca;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* AUTENTICAÇÃO */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            animation: rise 0.4s ease;
+        }
+
+        .auth-card h2 { text-align: center; margin-bottom: 6px; color: var(--primary); }
+        .auth-card p.subtitle { text-align: center; color: #64748b; font-size: 0.85em; margin-bottom: 24px; }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.85em; color: #334155; }
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.9em;
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #e0e7ff; }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover { background-color: var(--accent-hover); }
+        .btn-outline { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+        .btn-outline:hover { background: #e0e7ff; }
+
+        .auth-toggle { text-align: center; margin-top: 16px; font-size: 0.85em; color: #64748b; }
+        .auth-toggle button { background: none; border: none; color: var(--accent); font-weight: bold; cursor: pointer; text-decoration: underline; }
+
+        .error-box {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8em;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        /* LAYOUT PRINCIPAL */
+        #painel-principal { display: none; min-height: 100vh; }
+        .layout-wrapper { display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        aside.sidebar {
+            width: 240px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+        }
+
+        .brand { display: flex; align-items: center; gap: 12px; font-weight: bold; font-size: 1.1em; color: white; padding: 0 8px; }
+        nav.menu { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        
+        .menu-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px; color: #94a3b8; border-radius: 8px;
+            cursor: pointer; font-size: 0.9em; font-weight: 600; transition: 0.2s;
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .menu-item.active { background: var(--accent); color: white; }
+
+        .user-info { padding: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 10px; }
+        .user-name { font-size: 0.85em; color: #cbd5e1; font-weight: 600; }
+        .btn-logout { background-color: var(--danger); width: 100%; padding: 8px; font-size: 0.8em; }
+
+        /* MAIN */
+        main.main-content { margin-left: 240px; flex: 1; padding: 32px; width: calc(100% - 240px); }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .page-header h1 { font-size: 1.6em; color: var(--primary); }
+
+        .secao { display: none; animation: rise 0.3s ease; }
+        .secao.active { display: block; }
+
+        .card {
+            background: var(--card-bg); border-radius: 12px; padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid var(--border); margin-bottom: 24px;
+        }
+
+        .grid-dashboard { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 24px; }
+        @media (max-width: 1024px) { .grid-dashboard { grid-template-columns: 1fr; } }
+
+        /* CARDS METRICAS FINANCEIRAS */
+        .metrics-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            background: white; border: 1px solid var(--border);
+            border-radius: 12px; padding: 18px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .metric-card p.label { font-size: 0.8em; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .metric-card p.value { font-size: 1.4em; font-weight: bold; margin-top: 6px; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 0.9em; }
+        th { background-color: #f8fafc; color: var(--primary); font-weight: 600; }
+
+        .subtext { font-size: 0.78em; color: #64748b; display: block; margin-top: 2px; }
+        .badge-qtd { background: #e0e7ff; color: var(--accent); font-weight: bold; padding: 4px 8px; border-radius: 6px; font-size: 0.85em; }
+        .btn-pay { background-color: var(--success); padding: 6px 12px; font-size: 0.8em; }
+
+        .search-box { margin-bottom: 16px; }
+
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: var(--primary); color: white; padding: 12px 20px;
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: none; font-size: 0.9em; z-index: 100;
+        }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TELA DE AUTENTICAÇÃO -->
+    <div id="tela-auth" class="auth-container">
+        <div class="auth-card">
+            <h2 id="auth-titulo">🍺 Entre no seu Bar</h2>
+            <p id="auth-sub" class="subtitle">Acesse o controle de estoque e fiados</p>
+            <div id="auth-erro" class="error-box"></div>
+
+            <form id="form-auth" onsubmit="processarAuth(event)">
+                <div id="group-nome" class="form-group" style="display: none;">
+                    <label>Nome Completo / Responsável</label>
+                    <input type="text" id="auth-nome" placeholder="Ex: João da Silva">
+                </div>
+                <div class="form-group">
+                    <label>Usuário ou E-mail</label>
+                    <input type="text" id="auth-user" placeholder="Ex: admin" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="auth-pass" placeholder="••••••••" required>
+                    <p id="hint-senha" style="display:none; font-size: 0.72em; color: #64748b; margin-top: 4px;">
+                        Mínimo 8 caracteres: 1 maiúscula, 1 número e 1 caractere especial (@#$%).
+                    </p>
+                </div>
+                <button type="submit" id="btn-auth-submit" class="btn" style="width:100%;">Entrar</button>
+            </form>
+
+            <div class="auth-toggle">
+                <span id="toggle-text">Ainda não tem conta?</span>
+                <button type="button" onclick="alternarModoAuth()" id="toggle-btn">Cadastrar-se</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAINEL PRINCIPAL -->
+    <div id="painel-principal">
+        <div class="layout-wrapper">
+            <aside class="sidebar">
+                <div class="brand"><span>🍺</span> StockBar</div>
+                <nav class="menu">
+                    <div class="menu-item active" onclick="navegarPara('secao-dashboard', this)">📊 Visão Geral</div>
+                    <div class="menu-item" onclick="navegarPara('secao-estoque', this)">📦 Estoque Completo</div>
+                    <div class="menu-item" onclick="navegarPara('secao-fiado', this)">📝 Caderneta de Fiado</div>
+                </nav>
+                <div class="user-info">
+                    <span id="user-display" class="user-name"></span>
+                    <button class="btn btn-logout" onclick="fazerLogout()">Sair</button>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                
+                <!-- 1. PÁGINA VISÃO GERAL -->
+                <section id="secao-dashboard" class="secao active">
+                    <div class="page-header">
+                        <h1>📊 Visão Geral Financeira</h1>
+                        <button class="btn btn-outline" onclick="carregarListaAnterior()">🔄 Restaurar Lista do Caderno</button>
+                    </div>
+
+                    <!-- CARDS DE VALORES EM R$ -->
+                    <div class="metrics-bar">
+                        <div class="metric-card">
+                            <p class="label">Valor de Custo (Investido)</p>
+                            <p class="value" style="color: #475569;" id="dash-total-custo">R$ 0,00</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="label">Faturamento Total Previsto</p>
+                            <p class="value" style="color: var(--success);" id="dash-total-venda">R$ 0,00</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="label">Lucro Estimado do Estoque</p>
+                            <p class="value" style="color: var(--accent);" id="dash-lucro-estimado">R$ 0,00</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="label">Total em Fiados Pendentes</p>
+                            <p class="value" style="color: var(--danger);" id="dash-total-fiado">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <div class="grid-dashboard">
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                                <h2 style="font-size:1.1em;">📦 Resumo do Estoque</h2>
+                                <button class="btn" onclick="navegarPara('secao-estoque', document.querySelectorAll('.menu-item')[1])">Ver Tudo →</button>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Qtd</th>
+                                        <th>Custo Total</th>
+                                        <th>Venda Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-dash-estoque"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                                <h2 style="font-size:1.1em;">📝 Caderneta de Fiados</h2>
+                                <button class="btn" style="background:#d97706;" onclick="navegarPara('secao-fiado', document.querySelectorAll('.menu-item')[2])">Ver Todos →</button>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Valor Devido</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-dash-fiado"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. PÁGINA ESTOQUE COMPLETO -->
+                <section id="secao-estoque" class="secao">
+                    <div class="page-header">
+                        <h1>📦 Gestão do Estoque & Valores</h1>
+                    </div>
+
+                    <!-- METRICAS NO TOPO DA PÁGINA DE ESTOQUE -->
+                    <div class="metrics-bar">
+                        <div class="metric-card">
+                            <p class="label">Custo do Estoque Atual</p>
+                            <p class="value" style="color: #475569;" id="est-total-custo">R$ 0,00</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="label">Faturamento Total com Vendas</p>
+                            <p class="value" style="color: var(--success);" id="est-total-venda">R$ 0,00</p>
+                        </div>
+                        <div class="metric-card">
+                            <p class="label">Lucro Bruto Previsto</p>
+                            <p class="value" style="color: var(--accent);" id="est-lucro-estimado">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2 style="font-size:1.1em; margin-bottom:16px;">+ Cadastrar Novo Item no Estoque</h2>
+                        <form onsubmit="adicionarProduto(event)">
+                            <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr; gap: 12px; align-items: end;">
+                                <div class="form-group" style="margin:0;">
+                                    <label>Nome do Produto</label>
+                                    <input type="text" id="prod-nome" placeholder="Ex: Heineken 600ml" required>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Detalhamento (Caixas / Fardos)</label>
+                                    <input type="text" id="prod-detalhe" placeholder="Ex: 3 caixas + 13 garrafas">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Qtd Garrafas/Un</label>
+                                    <input type="number" id="prod-qtd" min="0" required placeholder="0">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Valor Compra (Un) R$</label>
+                                    <input type="number" step="0.01" id="prod-compra" placeholder="0.00">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Valor Venda (Un) R$</label>
+                                    <input type="number" step="0.01" id="prod-preco" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn" style="margin-top: 16px;">Salvar no Estoque</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="search-box">
+                            <input type="text" id="busca-estoque" placeholder="🔍 Pesquisar produto no estoque..." oninput="renderizarEstoqueCompleto()">
+                        </div>
+
+                        <div style="overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                        <th>Caixas / Embalagem</th>
+                                        <th>Quantidade Total</th>
+                                        <th>Custo Unit. / Total</th>
+                                        <th>Venda Unit. / Total Previsto</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-estoque-completa"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. PÁGINA FIADO -->
+                <section id="secao-fiado" class="secao">
+                    <div class="page-header">
+                        <h1>📝 Caderneta de Fiado</h1>
+                    </div>
+
+                    <div class="card">
+                        <h2 style="font-size:1.1em; margin-bottom:16px;">+ Lançar Nova Conta Fiada</h2>
+                        <form onsubmit="adicionarFiado(event)">
+                            <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 12px; align-items: end;">
+                                <div class="form-group" style="margin:0;">
+                                    <label>Cliente</label>
+                                    <input type="text" id="fiado-cliente" placeholder="Nome do cliente" required>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Item Consumido</label>
+                                    <input type="text" id="fiado-item" placeholder="Ex: 3x Cerveja 600ml" required>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Valor Devido (R$)</label>
+                                    <input type="number" step="0.01" id="fiado-valor" required placeholder="0.00">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn" style="background-color: #d97706; margin-top: 16px;">Lançar Dívida</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h2 style="font-size:1.1em; margin-bottom:16px;">Contas Pendentes</h2>
+                        <div style="overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Consumo</th>
+                                        <th>Valor Devido</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-fiado-completa"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let modoCadastro = false;
+
+        // Lista pré-cadastrada exata com os itens do caderno
+        const produtosIniciais = [
+            { nome: "Heineken Garrafa 600ml", qtd: 85, detalhe: "3 caixas + 13 garrafas", compra: 9.12, preco: 20.00 },
+            { nome: "Original Garrafa 600ml", qtd: 75, detalhe: "3 caixas + 3 garrafas", compra: 7.56, preco: 17.00 },
+            { nome: "Brahma Duplo Malte 600ml", qtd: 30, detalhe: "1 caixa + 6 garrafas", compra: 6.40, preco: 15.00 },
+            { nome: "Skol Garrafa 600ml", qtd: 60, detalhe: "2 caixas + 12 garrafas", compra: 6.25, preco: 13.00 },
+            { nome: "Skol Litrão Garrafa", qtd: 16, detalhe: "1 caixa + 4 garrafas", compra: 9.24, preco: 18.00 },
+            { nome: "Velho Barreiro Garrafa", qtd: 4, detalhe: "4 garrafas", compra: 0, preco: 0 },
+            { nome: "São Francisco Garrafa", qtd: 2, detalhe: "2 garrafas", compra: 0, preco: 0 },
+            { nome: "Dreher Garrafa", qtd: 2, detalhe: "2 garrafas", compra: 0, preco: 0 },
+            { nome: "Contini Garrafa", qtd: 2, detalhe: "2 garrafas", compra: 0, preco: 0 },
+            { nome: "Whisky Red Label Garrafa", qtd: 1, detalhe: "1 garrafa", compra: 0, preco: 0 },
+            { nome: "Kariri Garrafa", qtd: 2, detalhe: "2 garrafas", compra: 0, preco: 0 },
+            { nome: "São João da Barra Garrafa", qtd: 1, detalhe: "1 garrafa", compra: 0, preco: 0 },
+            { nome: "Cachaça 51 Garrafa", qtd: 3, detalhe: "3 garrafas", compra: 0, preco: 0 }
+        ];
+
+        let estoque = JSON.parse(localStorage.getItem('bar_estoque_v4')) || produtosIniciais;
+        let fiados = JSON.parse(localStorage.getItem('bar_fiados')) || [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const sessao = localStorage.getItem("usuario_logado");
+            if (sessao) {
+                exibirPainel(JSON.parse(sessao));
+            }
+        });
+
+        function carregarListaAnterior() {
+            estoque = [...produtosIniciais];
+            localStorage.setItem('bar_estoque_v4', JSON.stringify(estoque));
+            renderizarTodasAsTabelas();
+            mostrarToast("Lista de garrafas pré-carregada!");
+        }
+
+        function navegarPara(secaoId, elementoMenu) {
+            document.querySelectorAll('.secao').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+
+            document.getElementById(secaoId).classList.add('active');
+            if (elementoMenu) elementoMenu.classList.add('active');
+
+            renderizarTodasAsTabelas();
+        }
+
+        function alternarModoAuth() {
+            modoCadastro = !modoCadastro;
+            const erroEl = document.getElementById("auth-erro");
+            erroEl.style.display = "none";
+
+            document.getElementById("group-nome").style.display = modoCadastro ? "block" : "none";
+            document.getElementById("hint-senha").style.display = modoCadastro ? "block" : "none";
+            document.getElementById("auth-titulo").innerText = modoCadastro ? "📝 Criar Nova Conta" : "🍺 Entre no seu Bar";
+            document.getElementById("auth-sub").innerText = modoCadastro ? "Preencha os dados abaixo para cadastrar" : "Acesse o controle de estoque e fiados";
+            document.getElementById("btn-auth-submit").innerText = modoCadastro ? "Cadastrar Conta" : "Entrar";
+            document.getElementById("toggle-text").innerText = modoCadastro ? "Já possui conta?" : "Ainda não tem conta?";
+            document.getElementById("toggle-btn").innerText = modoCadastro ? "Fazer Login" : "Cadastrar-se";
+        }
+
+        async function processarAuth(e) {
+            e.preventDefault();
+            const erroEl = document.getElementById("auth-erro");
+            erroEl.style.display = "none";
+
+            const username = document.getElementById("auth-user").value;
+            const password = document.getElementById("auth-pass").value;
+            const nome = document.getElementById("auth-nome").value;
+
+            const endpoint = modoCadastro ? "/api/cadastrar" : "/api/login";
+            const corpo = modoCadastro ? { nome, username, password } : { username, password };
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(corpo)
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    if (modoCadastro) {
+                        mostrarToast("Conta criada com sucesso! Faça login.");
+                        alternarModoAuth();
+                    } else {
+                        localStorage.setItem("usuario_logado", JSON.stringify(data));
+                        exibirPainel(data);
+                    }
+                } else {
+                    erroEl.innerText = data.mensagem || "Erro na autenticação.";
+                    erroEl.style.display = "block";
+                }
+            } catch (err) {
+                erroEl.innerText = "Erro ao conectar com o servidor Spring Boot.";
+                erroEl.style.display = "block";
+            }
+        }
+
+        function exibirPainel(usuario) {
+            document.getElementById("tela-auth").style.display = "none";
+            document.getElementById("painel-principal").style.display = "block";
+            document.getElementById("user-display").innerText = usuario.nome;
+            renderizarTodasAsTabelas();
+            mostrarToast(`Bem-vindo, ${usuario.nome}!`);
+        }
+
+        function fazerLogout() {
+            localStorage.removeItem("usuario_logado");
+            window.location.reload();
+        }
+
+        function mostrarToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.style.display = "block";
+            setTimeout(() => { toast.style.display = "none"; }, 3000);
+        }
+
+        function formatarMoeda(val) {
+            return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function renderizarTodasAsTabelas() {
+            // CÁLCULOS FINANCEIROS DO ESTOQUE
+            const totalCusto = estoque.reduce((acc, item) => acc + (item.qtd * (item.compra || 0)), 0);
+            const totalVenda = estoque.reduce((acc, item) => acc + (item.qtd * (item.preco || 0)), 0);
+            const lucroEstimado = totalVenda - totalCusto;
+            const totalFiado = fiados.reduce((acc, item) => acc + item.valor, 0);
+
+            // ATUALIZAR DASHBOARD
+            document.getElementById("dash-total-custo").innerText = formatarMoeda(totalCusto);
+            document.getElementById("dash-total-venda").innerText = formatarMoeda(totalVenda);
+            document.getElementById("dash-lucro-estimado").innerText = formatarMoeda(lucroEstimado);
+            document.getElementById("dash-total-fiado").innerText = formatarMoeda(totalFiado);
+
+            // ATUALIZAR ESTOQUE TELA DEDICADA
+            document.getElementById("est-total-custo").innerText = formatarMoeda(totalCusto);
+            document.getElementById("est-total-venda").innerText = formatarMoeda(totalVenda);
+            document.getElementById("est-lucro-estimado").innerText = formatarMoeda(lucroEstimado);
+
+            renderizarDashboardTabelas();
+            renderizarEstoqueCompleto();
+            renderizarFiadoCompleto();
+        }
+
+        function renderizarDashboardTabelas() {
+            const tbodyEstoque = document.getElementById("tabela-dash-estoque");
+            tbodyEstoque.innerHTML = "";
+            estoque.slice(0, 5).forEach(p => {
+                const totalCustoItem = p.qtd * (p.compra || 0);
+                const totalVendaItem = p.qtd * (p.preco || 0);
+                tbodyEstoque.innerHTML += `
+                    <tr>
+                        <td><strong>${p.nome}</strong></td>
+                        <td><span class="badge-qtd">${p.qtd} un</span></td>
+                        <td>${totalCustoItem > 0 ? formatarMoeda(totalCustoItem) : '-'}</td>
+                        <td style="color:var(--success); font-weight:bold;">${totalVendaItem > 0 ? formatarMoeda(totalVendaItem) : '-'}</td>
+                    </tr>`;
+            });
+
+            const tbodyFiado = document.getElementById("tabela-dash-fiado");
+            tbodyFiado.innerHTML = "";
+            fiados.slice(0, 5).forEach(f => {
+                tbodyFiado.innerHTML += `
+                    <tr>
+                        <td><strong>${f.cliente}</strong></td>
+                        <td style="color:var(--danger); font-weight:bold;">${formatarMoeda(f.valor)}</td>
+                    </tr>`;
+            });
+        }
+
+        function renderizarEstoqueCompleto() {
+            const tbody = document.getElementById("tabela-estoque-completa");
+            const busca = document.getElementById("busca-estoque") ? document.getElementById("busca-estoque").value.toLowerCase() : "";
+            tbody.innerHTML = "";
+
+            estoque
+                .filter(p => p.nome.toLowerCase().includes(busca))
+                .forEach(p => {
+                    const totalCustoItem = p.qtd * (p.compra || 0);
+                    const totalVendaItem = p.qtd * (p.preco || 0);
+
+                    const unitCompraStr = p.compra > 0 ? formatarMoeda(p.compra) : "A definir";
+                    const unitVendaStr = p.preco > 0 ? formatarMoeda(p.preco) : "A definir";
+
+                    const totCompraStr = totalCustoItem > 0 ? formatarMoeda(totalCustoItem) : "-";
+                    const totVendaStr = totalVendaItem > 0 ? formatarMoeda(totalVendaItem) : "-";
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${p.nome}</strong></td>
+                            <td>${p.detalhe || 'Embalagem padrão'}</td>
+                            <td><span class="badge-qtd">${p.qtd} unidades</span></td>
+                            <td>${unitCompraStr} <span class="subtext">Total: ${totCompraStr}</span></td>
+                            <td><strong style="color:var(--success);">${unitVendaStr}</strong> <span class="subtext">Total Previsto: ${totVendaStr}</span></td>
+                        </tr>`;
+                });
+        }
+
+        function adicionarProduto(e) {
+            e.preventDefault();
+            estoque.push({
+                nome: document.getElementById("prod-nome").value,
+                detalhe: document.getElementById("prod-detalhe").value,
+                qtd: parseInt(document.getElementById("prod-qtd").value),
+                compra: parseFloat(document.getElementById("prod-compra").value) || 0,
+                preco: parseFloat(document.getElementById("prod-preco").value) || 0
+            });
+            localStorage.setItem('bar_estoque_v4', JSON.stringify(estoque));
+            renderizarTodasAsTabelas();
+            e.target.reset();
+            mostrarToast("Produto cadastrado no estoque!");
+        }
+
+        function renderizarFiadoCompleto() {
+            const tbody = document.getElementById("tabela-fiado-completa");
+            tbody.innerHTML = "";
+            fiados.forEach((f, index) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><strong>${f.cliente}</strong></td>
+                        <td>${f.item}</td>
+                        <td style="color:var(--danger);font-weight:bold;">${formatarMoeda(f.valor)}</td>
+                        <td><button class="btn btn-pay" onclick="quitarFiado(${index})">Dar Baixa</button></td>
+                    </tr>`;
+            });
+        }
+
+        function adicionarFiado(e) {
+            e.preventDefault();
+            fiados.push({
+                cliente: document.getElementById("fiado-cliente").value,
+                item: document.getElementById("fiado-item").value,
+                valor: parseFloat(document.getElementById("fiado-valor").value)
+            });
+            localStorage.setItem('bar_fiados', JSON.stringify(fiados));
+            renderizarTodasAsTabelas();
+            e.target.reset();
+            mostrarToast("Dívida registrada!");
+        }
+
+        function quitarFiado(index) {
+            fiados.splice(index, 1);
+            localStorage.setItem('bar_fiados', JSON.stringify(fiados));
+            renderizarTodasAsTabelas();
+            mostrarToast("Conta quitada!");
+        }
+    </script>
+</body>
+</html>
