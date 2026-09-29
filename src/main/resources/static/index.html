@@ -463,9 +463,11 @@
                     document.getElementById("auth-pass").value = "";
                     carregarEstoque();
                 } else {
-                    const data = await res.json().catch(() => ({}));
-                    erroEl.innerText = data.mensagem || "Erro ao realizar autenticação";
-                    erroEl.style.display = "block";
+                    if (erroEl){
+                
+                        erroEl.innerText = data.mensagem || "Erro ao realizar autenticação";
+                        erroEl.style.display = "block";
+                    }
                 }
             } catch (err) {
                 if (erroEl) {
