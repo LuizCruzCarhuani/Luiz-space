@@ -435,12 +435,12 @@
             }
         }
 
-        // Processar Autenticação (Login / Cadastro)
+        // Aqui, funcionará o Login e Cadastro
         async function processarAuth(e) {
             if (e) e.preventDefault();
             
             const erroEl = document.getElementById("auth-erro");
-            erroEl.style.display = "none";
+            if (errroEl) erroEl.style.display = "none";
 
             const username = document.getElementById("auth-user").value;
             const password = document.getElementById("auth-pass").value;
@@ -456,8 +456,11 @@
                     body: JSON.stringify(corpo)
                 });
 
+                const data = await res.json().catch(() => ({}));
+
                 if (res.ok) {
                     document.getElementById("auth-modal").style.display = "none";
+                    document.getElementById("auth-pass").value = "";
                     carregarEstoque();
                 } else {
                     const data = await res.json().catch(() => ({}));
@@ -465,8 +468,10 @@
                     erroEl.style.display = "block";
                 }
             } catch (err) {
-                erroEl.innerText = "Erro ao conectar com o servidor";
-                erroEl.style.display = "block";
+                if (erroEl) {
+                    erroEl.innerText = "Erro ao conectar com o servidor. Tente Novamente";
+                    erroEl.style.display = "block";
+                }
             }
         }
 
