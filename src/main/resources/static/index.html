@@ -4,97 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StockLá - Gestão de Bar & Estoque</title>
-    <!-- Chart.js para o Gráfico do Dashboard -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { display: flex; background-color: #f4f6f9; color: #333; min-height: 100vh; }
-
-        /* Sidebar */
-        .sidebar { width: 260px; background-color: #2c3e50; color: #ecf0f1; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
-        .sidebar-header h2 { font-size: 1.6rem; color: #3498db; text-align: center; margin-bottom: 25px; }
-        .sidebar-nav { display: flex; flex-direction: column; gap: 8px; }
-        .nav-link { color: #ecf0f1; text-decoration: none; padding: 12px 15px; border-radius: 6px; transition: 0.2s; font-weight: 500; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
-        .nav-link:hover, .nav-link.active { background-color: #34495e; color: #3498db; }
-        .badge-soon { background-color: #6c5ce7; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 8px; font-weight: bold; }
-        .btn-logout { background-color: #e74c3c; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 15px; }
-
-        /* Conteúdo e Abas */
-        .main-content { flex: 1; padding: 25px; overflow-y: auto; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-
-        /* Cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .card h3 { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 8px; text-transform: uppercase; }
-        .card p { font-size: 1.6rem; font-weight: 700; color: #2c3e50; }
-
-        /* Tabelas e Formulários */
-        .box-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 12px; align-items: end; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group label { font-size: 0.85rem; font-weight: 600; color: #555; }
-        .form-group input { padding: 9px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; }
-        .btn-add { background-color: #2ecc71; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f8f9fa; color: #2c3e50; font-weight: 600; }
-
-        /* Indicadores de Risco (Status Bolinhas) */
-        .status-dot { height: 12px; width: 12px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-        .dot-green { background-color: #2ecc71; box-shadow: 0 0 5px #2ecc71; }
-        .dot-yellow { background-color: #f1c40f; box-shadow: 0 0 5px #f1c40f; }
-        .dot-red { background-color: #e74c3c; box-shadow: 0 0 5px #e74c3c; }
-
-        /* Botões */
-        .btn-sm { border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.8rem; margin-right: 4px; }
-        .btn-edit { background-color: #3498db; color: white; }
-        .btn-zero { background-color: #f39c12; color: white; }
-        .btn-delete { background-color: #e74c3c; color: white; }
-
-        /* Modal Auth */
-        .auth-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:1000; }
-        .auth-card { background:white; padding:30px; border-radius:10px; width:350px; text-align:center; }
-        .auth-form { display:flex; flex-direction:column; gap:12px; margin-top:15px; }
-        .auth-form input { padding:10px; border:1px solid #ccc; border-radius:6px; }
-        .btn-auth { background-color:#3498db; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:600; }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; }
-            .form-grid { grid-template-columns: 1fr; }
-            .table-responsive { overflow-x: auto; }
-        }
-    </style>
+    <!-- CSS Separado -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Chart.js para o Gráfico -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <!-- LISTA DE BEBIDAS PRÉ-PREENCHIDAS PARA AUTOCOMPLETE -->
     <datalist id="lista-bebidas-sugeridas">
         <option value="Heineken Garrafa 600ml">
         <option value="Heineken Long Neck 330ml">
         <option value="Heineken Lata 350ml">
-        <option value="Heineken Lata 269ml">
         <option value="Amstel Garrafa 600ml">
-        <option value="Amstel Lata 350ml">
         <option value="Brahma Duplo Malte 600ml">
-        <option value="Brahma Chopp Lata 350ml">
         <option value="Skol Garrafa 600ml">
-        <option value="Stella Artois Long Neck 330ml">
         <option value="Red Bull Energy Drink 250ml">
         <option value="Coca-Cola Original 2L">
-        <option value="Coca-Cola Lata 350ml">
-        <option value="Guaraná Antarctica 2L">
-        <option value="Cachaça 51 960ml">
-        <option value="Vodka Smirnoff 998ml">
-        <option value="Corote Sabores 500ml">
     </datalist>
 
-    <!-- MODAL AUTH -->
+    <!-- Modal Auth -->
     <div id="auth-modal" class="auth-overlay">
         <div class="auth-card">
             <h2 id="auth-title">StockLá - Entrar</h2>
@@ -112,12 +42,10 @@
         </div>
     </div>
 
-    <!-- SIDEBAR -->
+    <!-- Sidebar PC -->
     <aside class="sidebar">
         <div>
-            <div class="sidebar-header">
-                <h2>StockLá</h2>
-            </div>
+            <div class="sidebar-header"><h2>StockLá</h2></div>
             <nav class="sidebar-nav">
                 <a class="nav-link active" onclick="mudarAba('home', this)">🏠 Home</a>
                 <a class="nav-link" onclick="mudarAba('dashboard', this)">📊 Dashboard</a>
@@ -131,10 +59,9 @@
         </div>
     </aside>
 
-    <!-- CONTEÚDO PRINCIPAL -->
+    <!-- Conteúdo Principal -->
     <main class="main-content">
-
-        <!-- ABA 1: HOME (RESUMO GERAL) -->
+        <!-- Home -->
         <section id="tab-home" class="tab-content active">
             <div class="top-bar"><h1>Visão Geral do Bar</h1></div>
             <div class="stats-grid">
@@ -142,36 +69,30 @@
                 <div class="card"><h3>Patrimônio em Estoque</h3><p id="home-valor-estoque">R$ 0,00</p></div>
                 <div class="card"><h3>Total a Receber (Fiados)</h3><p id="home-total-fiado" style="color:#e67e22;">R$ 0,00</p></div>
             </div>
-            <div class="box-container">
-                <h2>Atalhos Rápidos</h2>
-                <p style="margin-top: 10px; color:#666;">Selecione a aba desejada no menu lateral para gerenciar o estoque ou lançar contas pendentes de clientes no caderninho.</p>
-            </div>
         </section>
 
-        <!-- ABA 2: DASHBOARD (ANÁLISE E GRÁFICO DE FIADO) -->
+        <!-- Dashboard -->
         <section id="tab-dashboard" class="tab-content">
             <div class="top-bar"><h1>Dashboard Financeiro</h1></div>
             <div class="stats-grid">
                 <div class="card"><h3>Valor de Estoque Disponível</h3><p id="dash-valor-estoque">R$ 0,00</p></div>
                 <div class="card"><h3>Soma Total em Fiado</h3><p id="dash-valor-fiado" style="color:#e74c3c;">R$ 0,00</p></div>
-                <div class="card"><h3>Risco do Bar em Fiado</h3><p id="dash-risco-porcentagem">0%</p></div>
+                <div class="card"><h3>Risco em Fiado</h3><p id="dash-risco-porcentagem">0%</p></div>
             </div>
             <div class="box-container">
-                <h2>Comparativo: Estoque vs. Fiado no Mercado</h2>
+                <h2>Comparativo: Estoque vs. Fiado</h2>
                 <canvas id="graficoComparativo" style="max-height: 320px; margin-top: 15px;"></canvas>
             </div>
         </section>
 
-        <!-- ABA 3: ESTOQUE -->
+        <!-- Estoque -->
         <section id="tab-estoque" class="tab-content">
             <div class="top-bar"><h1>Gestão de Estoque</h1></div>
-            
             <div class="box-container">
-                <h2>Cadastrar / Entrada de Bebida</h2>
+                <h2>Cadastrar Produto</h2>
                 <form id="form-item" onsubmit="cadastrarItem(event)" class="form-grid">
                     <div class="form-group">
-                        <label>Nome do Produto (Bebida)</label>
-                        <!-- AUTOCOMPLETE VINCULADO AO DATALIST -->
+                        <label>Nome do Produto</label>
                         <input type="text" id="nome-item" list="lista-bebidas-sugeridas" placeholder="Digite ou selecione..." required>
                     </div>
                     <div class="form-group">
@@ -179,33 +100,24 @@
                         <input type="number" id="qtd-item" placeholder="0" min="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Preço de Venda (R$)</label>
+                        <label>Preço (R$)</label>
                         <input type="number" id="preco-item" placeholder="0.00" step="0.01" min="0" required>
                     </div>
                     <button type="submit" class="btn-add">➕ Adicionar</button>
                 </form>
             </div>
-
             <div class="box-container table-responsive">
                 <h2>Produtos no Estoque</h2>
                 <table id="tabela-estoque">
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>Quantidade</th>
-                            <th>Preço Unitário</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Nome</th><th>Quantidade</th><th>Preço</th><th>Ações</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- ABA 4: CADERNINHO (GESTÃO DE FIADO) -->
+        <!-- Caderninho -->
         <section id="tab-caderninho" class="tab-content">
             <div class="top-bar"><h1>Caderninho de Fiados</h1></div>
-
             <div class="box-container">
                 <h2>Novo Cliente Devedor</h2>
                 <form id="form-fiado" onsubmit="cadastrarFiado(event)" class="form-grid">
@@ -214,311 +126,35 @@
                         <input type="text" id="nome-fiado" placeholder="Ex: Zé do Bairro" required>
                     </div>
                     <div class="form-group">
-                        <label>Valor Inicial da Dívida (R$)</label>
+                        <label>Valor Inicial (R$)</label>
                         <input type="number" id="valor-fiado" placeholder="0.00" step="0.01" min="0" required>
                     </div>
                     <button type="submit" class="btn-add">📒 Cadastrar Fiado</button>
                 </form>
             </div>
-
             <div class="box-container table-responsive">
                 <h2>Lista de Clientes em Aberto</h2>
-                <p style="font-size:0.85rem; color:#7f8c8d; margin-bottom:12px;">
-                    Legenda de Risco: <span class="status-dot dot-green"></span> Baixo (até R$100) | 
-                    <span class="status-dot dot-yellow"></span> Atenção (até R$250) | 
-                    <span class="status-dot dot-red"></span> Alto Risco (> R$250)
-                </p>
                 <table id="tabela-fiados">
-                    <thead>
-                        <tr>
-                            <th>Status</th>
-                            <th>Cliente</th>
-                            <th>Valor em Aberto</th>
-                            <th>Ações de Cobrança</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Status</th><th>Cliente</th><th>Valor em Aberto</th><th>Ações</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
         </section>
-
     </main>
 
-    <script>
-        let modoCadastro = false;
-        let listaEstoque = [];
-        let listaFiados = JSON.parse(localStorage.getItem('stockla_fiados')) || [];
-        let meuGrafico = null;
+    <!-- Barra Mobile Rodapé -->
+    <div class="mobile-nav-bar">
+        <div class="mobile-nav-item active" onclick="mudarAba('home', this)"><span>🏠</span><span>Home</span></div>
+        <div class="mobile-nav-item" onclick="mudarAba('dashboard', this)"><span>📊</span><span>Dash</span></div>
+        <div class="mobile-nav-item" onclick="mudarAba('estoque', this)"><span>📦</span><span>Estoque</span></div>
+        <div class="mobile-nav-item" onclick="mudarAba('caderninho', this)"><span>📒</span><span>Fiado</span></div>
+    </div>
 
-        // NAVEGAÇÃO ENTRE ABAS
-        function mudarAba(nomeAba, elemento) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-            
-            document.getElementById(`tab-${nomeAba}`).classList.add('active');
-            if (elemento) elemento.classList.add('active');
-
-            if (nomeAba === 'dashboard') renderizarGrafico();
-        }
-
-        // AUTH
-        function alternarModoAuth() {
-            modoCadastro = !modoCadastro;
-            document.getElementById("auth-title").innerText = modoCadastro ? "StockLá - Criar Conta" : "StockLá - Entrar";
-            document.getElementById("btn-auth-submit").innerText = modoCadastro ? "Cadastrar" : "Entrar";
-            document.getElementById("auth-toggle-text").innerText = modoCadastro ? "Já tem conta?" : "Não tem conta?";
-            document.getElementById("auth-toggle-link").innerText = modoCadastro ? "Fazer Login" : "Cadastrar-se";
-            document.getElementById("field-nome").style.display = modoCadastro ? "block" : "none";
-        }
-
-        async function processarAuth(e) {
-            if (e) e.preventDefault();
-            const erroEl = document.getElementById("auth-erro");
-            erroEl.style.display = "none";
-
-            const username = document.getElementById("auth-user").value;
-            const password = document.getElementById("auth-pass").value;
-            const nome = document.getElementById("auth-nome")?.value;
-
-            const endpoint = modoCadastro ? "/api/cadastrar" : "/api/login";
-            const corpo = modoCadastro ? { nome, username, password } : { username, password };
-
-            try {
-                const res = await fetch(endpoint, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(corpo)
-                });
-                const data = await res.json().catch(() => ({}));
-
-                if (res.ok) {
-                    document.getElementById("auth-modal").style.display = "none";
-                    carregarEstoque();
-                } else {
-                    erroEl.innerText = data.mensagem || "Erro ao realizar autenticação";
-                    erroEl.style.display = "block";
-                }
-            } catch (err) {
-                erroEl.innerText = "Erro na conexão com o servidor";
-                erroEl.style.display = "block";
-            }
-        }
-
-        function logout() {
-            fetch('/api/logout', { method: 'POST' }).catch(() => {});
-            document.getElementById("auth-modal").style.display = "flex";
-        }
-
-        // CARREGAR DADOS DO ESTOQUE
-        async function carregarEstoque() {
-            try {
-                const res = await fetch('/api/estoque');
-                if (res.status === 401) {
-                    document.getElementById("auth-modal").style.display = "flex";
-                    return;
-                }
-                document.getElementById("auth-modal").style.display = "none";
-                listaEstoque = await res.json();
-                renderizarTabelaEstoque();
-                renderizarTabelaFiados();
-                atualizarResumos();
-            } catch (err) {
-                console.error("Erro ao carregar estoque:", err);
-            }
-        }
-
-        // GERENCIAR ESTOQUE
-        function renderizarTabelaEstoque() {
-            const tbody = document.querySelector('#tabela-estoque tbody');
-            tbody.innerHTML = '';
-
-            if (listaEstoque.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhum produto cadastrado.</td></tr>';
-                return;
-            }
-
-            listaEstoque.forEach(item => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${item.nome}</td>
-                        <td>${item.quantidade}</td>
-                        <td>R$ ${Number(item.preco).toFixed(2)}</td>
-                        <td>
-                            <button class="btn-sm btn-edit" onclick="editarItem(${item.id}, '${item.nome}', ${item.quantidade}, ${item.preco})">✏️ Editar</button>
-                            <button class="btn-sm btn-zero" onclick="zerarEstoque(${item.id})">⚠️ Zerar</button>
-                            <button class="btn-sm btn-delete" onclick="excluirItem(${item.id})">🗑️ Excluir</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        async function cadastrarItem(e) {
-            e.preventDefault();
-            const nome = document.getElementById("nome-item").value;
-            const quantidade = parseInt(document.getElementById("qtd-item").value);
-            const preco = parseFloat(document.getElementById("preco-item").value);
-
-            await fetch('/api/estoque', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, quantidade, preco })
-            });
-            document.getElementById("form-item").reset();
-            carregarEstoque();
-        }
-
-        async function zerarEstoque(id) {
-            if (confirm("Deseja zerar a quantidade deste produto?")) {
-                await fetch(`/api/estoque/${id}/zerar`, { method: 'PATCH' });
-                carregarEstoque();
-            }
-        }
-
-        async function excluirItem(id) {
-            if (confirm("Excluir este item permanentemente?")) {
-                await fetch(`/api/estoque/${id}`, { method: 'DELETE' });
-                carregarEstoque();
-            }
-        }
-
-        async function editarItem(id, nome, qtd, preco) {
-            const novoNome = prompt("Novo Nome:", nome);
-            const novaQtd = prompt("Nova Quantidade:", qtd);
-            const novoPreco = prompt("Novo Preço (R$):", preco);
-
-            if (novoNome && novaQtd !== null && novoPreco !== null) {
-                await fetch(`/api/estoque/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome: novoNome, quantidade: parseInt(novaQtd), preco: parseFloat(novoPreco) })
-                });
-                carregarEstoque();
-            }
-        }
-
-        // GERENCIAR CADERNINHO (FIADOS)
-        function cadastrarFiado(e) {
-            e.preventDefault();
-            const nome = document.getElementById("nome-fiado").value;
-            const valor = parseFloat(document.getElementById("valor-fiado").value);
-
-            listaFiados.push({ id: Date.now(), cliente: nome, valor: valor });
-            salvarFiados();
-            document.getElementById("form-fiado").reset();
-            renderizarTabelaFiados();
-            atualizarResumos();
-        }
-
-        function salvarFiados() {
-            localStorage.setItem('stockla_fiados', JSON.stringify(listaFiados));
-        }
-
-        function renderizarTabelaFiados() {
-            const tbody = document.querySelector('#tabela-fiados tbody');
-            tbody.innerHTML = '';
-
-            if (listaFiados.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhum fiado registrado.</td></tr>';
-                return;
-            }
-
-            listaFiados.forEach(f => {
-                let dotClass = 'dot-green';
-                if (f.valor > 250) dotClass = 'dot-red';
-                else if (f.valor > 100) dotClass = 'dot-yellow';
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td><span class="status-dot ${dotClass}"></span></td>
-                        <td><strong>${f.cliente}</strong></td>
-                        <td>R$ ${f.valor.toFixed(2)}</td>
-                        <td>
-                            <button class="btn-sm btn-edit" onclick="alterarFiado(${f.id}, 10)">+ R$10</button>
-                            <button class="btn-sm btn-zero" onclick="alterarFiado(${f.id}, -10)">- R$10</button>
-                            <button class="btn-sm btn-delete" onclick="quitarFiado(${f.id})">✅ Quitar</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function alterarFiado(id, delta) {
-            const item = listaFiados.find(f => f.id === id);
-            if (item) {
-                item.valor = Math.max(0, item.valor + delta);
-                salvarFiados();
-                renderizarTabelaFiados();
-                atualizarResumos();
-            }
-        }
-
-        function quitarFiado(id) {
-            if (confirm("Confirmar que o cliente pagou e quitar a conta?")) {
-                listaFiados = listaFiados.filter(f => f.id !== id);
-                salvarFiados();
-                renderizarTabelaFiados();
-                atualizarResumos();
-            }
-        }
-
-        // CÁLCULOS E RESUMOS
-        function atualizarResumos() {
-            const totalItens = listaEstoque.length;
-            const valorEstoque = listaEstoque.reduce((acc, i) => acc + (i.quantidade * i.preco), 0);
-            const totalFiado = listaFiados.reduce((acc, f) => acc + f.valor, 0);
-
-            // Atualiza Home
-            document.getElementById('home-total-itens').innerText = totalItens;
-            document.getElementById('home-valor-estoque').innerText = `R$ ${valorEstoque.toFixed(2)}`;
-            document.getElementById('home-total-fiado').innerText = `R$ ${totalFiado.toFixed(2)}`;
-
-            // Atualiza Dashboard
-            document.getElementById('dash-valor-estoque').innerText = `R$ ${valorEstoque.toFixed(2)}`;
-            document.getElementById('dash-valor-fiado').innerText = `R$ ${totalFiado.toFixed(2)}`;
-
-            const percentualRisco = valorEstoque > 0 ? ((totalFiado / valorEstoque) * 100).toFixed(1) : 0;
-            document.getElementById('dash-risco-porcentagem').innerText = `${percentualRisco}% do valor do estoque`;
-        }
-
-        // DESENHAR GRÁFICO (CHART.JS)
-        function renderizarGrafico() {
-            const ctx = document.getElementById('graficoComparativo')?.getContext('2d');
-            if (!ctx) return;
-
-            const valorEstoque = listaEstoque.reduce((acc, i) => acc + (i.quantidade * i.preco), 0);
-            const totalFiado = listaFiados.reduce((acc, f) => acc + f.valor, 0);
-
-            if (meuGrafico) meuGrafico.destroy();
-
-            meuGrafico = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Atual'],
-                    datasets: [
-                        {
-                            label: 'Valor Total em Estoque (R$)',
-                            data: [valorEstoque * 0.8, valorEstoque * 0.9, valorEstoque * 0.95, valorEstoque],
-                            borderColor: '#3498db',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            borderWidth: 3,
-                            fill: true
-                        },
-                        {
-                            label: 'Total em Fiado / Devedores (R$)',
-                            data: [totalFiado * 0.5, totalFiado * 0.7, totalFiado * 0.85, totalFiado],
-                            borderColor: '#e74c3c',
-                            borderWidth: 2,
-                            borderDash: [6, 6], // LINHA PONTILHADA PARA DESTACAR O FIADO
-                            fill: false
-                        }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
-        document.addEventListener("DOMContentLoaded", carregarEstoque);
-    </script>
+    <!-- Scripts Separados -->
+    <script src="/js/auth.js"></script>
+    <script src="/js/estoque.js"></script>
+    <script src="/js/fiado.js"></script>
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/app.js"></script>
 </body>
 </html>
