@@ -3,7 +3,8 @@ body { display: flex; background-color: #f4f6f9; color: #333; min-height: 100vh;
 
 /* Sidebar */
 .sidebar { width: 260px; background-color: #2c3e50; color: #ecf0f1; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
-.sidebar-header h2 { font-size: 1.6rem; color: #3498db; text-align: center; margin-bottom: 25px; }
+.sidebar-header { text-align: center; margin-bottom: 25px; }
+.brand-logo { max-width: 150px; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.3)); }
 .sidebar-nav { display: flex; flex-direction: column; gap: 8px; }
 .nav-link { color: #ecf0f1; text-decoration: none; padding: 12px 15px; border-radius: 6px; transition: 0.2s; font-weight: 500; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
 .nav-link:hover, .nav-link.active { background-color: #34495e; color: #3498db; }
@@ -48,8 +49,11 @@ th { background-color: #f8f9fa; color: #2c3e50; font-weight: 600; }
 
 /* Modal Auth */
 .auth-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; justify-content:center; align-items:center; z-index:1000; }
-.auth-card { background:white; padding:30px; border-radius:10px; width:350px; text-align:center; }
-.auth-form { display:flex; flex-direction:column; gap:12px; margin-top:15px; }
+.auth-card { background:white; padding:30px; border-radius:10px; width:350px; text-align:center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+.auth-header { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px; }
+.auth-logo { max-width: 120px; height: auto; }
+.auth-header h2 { font-size: 1.4rem; color: #2c3e50; }
+.auth-form { display:flex; flex-direction:column; gap:12px; margin-top:10px; }
 .auth-form input { padding:10px; border:1px solid #ccc; border-radius:6px; }
 .btn-auth { background-color:#3498db; color:white; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:600; }
 
@@ -59,7 +63,8 @@ th { background-color: #f8f9fa; color: #2c3e50; font-weight: 600; }
 @media (max-width: 768px) {
     body { flex-direction: column; padding-bottom: 70px; }
     .sidebar { width: 100%; padding: 12px 15px; position: sticky; top: 0; z-index: 100; }
-    .sidebar-header h2 { font-size: 1.3rem; margin-bottom: 0; }
+    .brand-logo { max-width: 110px; }
+    .sidebar-header { margin-bottom: 0; }
     .sidebar-nav { display: none; }
 
     .mobile-nav-bar {

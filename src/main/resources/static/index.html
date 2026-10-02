@@ -27,7 +27,10 @@
     <!-- Modal Auth -->
     <div id="auth-modal" class="auth-overlay">
         <div class="auth-card">
-            <h2 id="auth-title">StockLá - Entrar</h2>
+            <div> class="auth-header">
+                <img src="/img/logo.png" alt="StockLá Logo" class="auth-logo">
+            <h2 id="auth-title">Entrar</h2>
+            </div>
             <form class="auth-form" onsubmit="processarAuth(event)">
                 <div id="field-nome" style="display:none;"><input type="text" id="auth-nome" placeholder="Seu Nome"></div>
                 <input type="text" id="auth-user" placeholder="Usuário / E-mail" required>
@@ -45,7 +48,9 @@
     <!-- Sidebar PC -->
     <aside class="sidebar">
         <div>
-            <div class="sidebar-header"><h2>StockLá</h2></div>
+            <div class="sidebar-header">
+                <img src="/img/logo.png" alt="StockLá Logo" class="brand-logo">
+            </div>
             <nav class="sidebar-nav">
                 <a class="nav-link active" onclick="mudarAba('home', this)">🏠 Home</a>
                 <a class="nav-link" onclick="mudarAba('dashboard', this)">📊 Dashboard</a>

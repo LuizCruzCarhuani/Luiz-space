@@ -2,7 +2,7 @@ let modoCadastro = false;
 
 function alternarModoAuth() {
     modoCadastro = !modoCadastro;
-    document.getElementById("auth-title").innerText = modoCadastro ? "StockLá - Criar Conta" : "StockLá - Entrar";
+    document.getElementById("auth-title").innerText = modoCadastro ? "Criar Conta" : "Entrar";
     document.getElementById("btn-auth-submit").innerText = modoCadastro ? "Cadastrar" : "Entrar";
     document.getElementById("auth-toggle-text").innerText = modoCadastro ? "Já tem conta?" : "Não tem conta?";
     document.getElementById("auth-toggle-link").innerText = modoCadastro ? "Fazer Login" : "Cadastrar-se";
