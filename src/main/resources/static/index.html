@@ -13,6 +13,7 @@
 </head>
 <body>
 
+    <!-- LISTA DE BEBIDAS SUGERIDAS -->
     <datalist id="lista-bebidas-sugeridas">
         <option value="Heineken Garrafa 600ml">
         <option value="Heineken Long Neck 330ml">
@@ -24,12 +25,12 @@
         <option value="Coca-Cola Original 2L">
     </datalist>
 
-    <!-- Modal Auth -->
+    <!-- MODAL AUTH (LOGIN / CADASTRO) -->
     <div id="auth-modal" class="auth-overlay">
         <div class="auth-card">
-            <div> class="auth-header">
+            <div class="auth-header">
                 <img src="/img/logo.png" alt="StockLá Logo" class="auth-logo">
-            <h2 id="auth-title">Entrar</h2>
+                <h2 id="auth-title">Entrar</h2>
             </div>
             <form class="auth-form" onsubmit="processarAuth(event)">
                 <div id="field-nome" style="display:none;"><input type="text" id="auth-nome" placeholder="Seu Nome"></div>
@@ -45,7 +46,7 @@
         </div>
     </div>
 
-    <!-- Sidebar PC -->
+    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div>
             <div class="sidebar-header">
@@ -64,7 +65,7 @@
         </div>
     </aside>
 
-    <!-- Conteúdo Principal -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="main-content">
         <!-- Home -->
         <section id="tab-home" class="tab-content active">
@@ -147,7 +148,7 @@
         </section>
     </main>
 
-    <!-- Barra Mobile Rodapé -->
+    <!-- BARRA DE NAVEGAÇÃO PARA CELULAR -->
     <div class="mobile-nav-bar">
         <div class="mobile-nav-item active" onclick="mudarAba('home', this)"><span>🏠</span><span>Home</span></div>
         <div class="mobile-nav-item" onclick="mudarAba('dashboard', this)"><span>📊</span><span>Dash</span></div>
@@ -155,7 +156,7 @@
         <div class="mobile-nav-item" onclick="mudarAba('caderninho', this)"><span>📒</span><span>Fiado</span></div>
     </div>
 
-    <!-- Scripts Separados -->
+    <!-- SCRIPTS JAVASCRIPT -->
     <script src="/js/auth.js"></script>
     <script src="/js/estoque.js"></script>
     <script src="/js/fiado.js"></script>
