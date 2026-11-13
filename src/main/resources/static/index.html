@@ -73,6 +73,7 @@
             <div class="stats-grid">
                 <div class="card"><h3>Itens no Estoque</h3><p id="home-total-itens">0</p></div>
                 <div class="card"><h3>Patrimônio em Estoque</h3><p id="home-valor-estoque">R$ 0,00</p></div>
+                <div class="card"><h3>Lucro Bruto Estimado</h3><p id="home-lucro-bruto" style="color:#2ecc71;">R$ 0,00</p></div>
                 <div class="card"><h3>Total a Receber (Fiados)</h3><p id="home-total-fiado" style="color:#e67e22;">R$ 0,00</p></div>
             </div>
         </section>
@@ -82,6 +83,7 @@
             <div class="top-bar"><h1>Dashboard Financeiro</h1></div>
             <div class="stats-grid">
                 <div class="card"><h3>Valor de Estoque Disponível</h3><p id="dash-valor-estoque">R$ 0,00</p></div>
+                <div class="card"><h3>Lucro Projetado</h3><p id="dash-lucro-projetado" style="color:#2ecc71;">R$ 0,00</p></div>
                 <div class="card"><h3>Soma Total em Fiado</h3><p id="dash-valor-fiado" style="color:#e74c3c;">R$ 0,00</p></div>
                 <div class="card"><h3>Risco em Fiado</h3><p id="dash-risco-porcentagem">0%</p></div>
             </div>
@@ -102,11 +104,23 @@
                         <input type="text" id="nome-item" list="lista-bebidas-sugeridas" placeholder="Digite ou selecione..." required>
                     </div>
                     <div class="form-group">
+                        <label>Embalagem</label>
+                        <select id="tipo-embalagem" class="form-control" style="width:100%; padding: 8px; background:#1e1e1e; color:#fff; border:1px solid #444; border-radius:4px;">
+                            <option value="Unidade">Unidade (Solto)</option>
+                            <option value="Fardo">Fardo</option>
+                            <option value="Caixa">Caixa</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Quantidade</label>
                         <input type="number" id="qtd-item" placeholder="0" min="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Preço (R$)</label>
+                        <label>Preço de Custo (R$)</label>
+                        <input type="number" id="preco-custo" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Preço de Venda (R$)</label>
                         <input type="number" id="preco-item" placeholder="0.00" step="0.01" min="0" required>
                     </div>
                     <button type="submit" class="btn-add">➕ Adicionar</button>
@@ -115,7 +129,17 @@
             <div class="box-container table-responsive">
                 <h2>Produtos no Estoque</h2>
                 <table id="tabela-estoque">
-                    <thead><tr><th>Nome</th><th>Quantidade</th><th>Preço</th><th>Ações</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Embalagem</th>
+                            <th>Qtd</th>
+                            <th>Custo Unit.</th>
+                            <th>Venda Unit.</th>
+                            <th>Lucro Est.</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -148,7 +172,7 @@
         </section>
     </main>
 
-    <!-- BARRA DE NAVEGAÇÃO PARA CELULAR -->
+    <!-- Navegador doc Celular -->
     <div class="mobile-nav-bar">
         <div class="mobile-nav-item active" onclick="mudarAba('home', this)"><span>🏠</span><span>Home</span></div>
         <div class="mobile-nav-item" onclick="mudarAba('dashboard', this)"><span>📊</span><span>Dash</span></div>
@@ -156,7 +180,7 @@
         <div class="mobile-nav-item" onclick="mudarAba('caderninho', this)"><span>📒</span><span>Fiado</span></div>
     </div>
 
-    <!-- SCRIPTS JAVASCRIPT -->
+    <!-- Códigos no JavaScript -->
     <script src="/js/auth.js"></script>
     <script src="/js/estoque.js"></script>
     <script src="/js/fiado.js"></script>
