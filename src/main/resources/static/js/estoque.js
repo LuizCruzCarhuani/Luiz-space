@@ -69,9 +69,14 @@ async function cadastrarItem(e) {
     const nome = document.getElementById("nome-item").value;
     const tipoEmbalagem = document.getElementById("tipo-embalagem").value;
     const unidadesPorEmbalagem = parseInt(document.getElementById("unidades-por-embalagem").value) || 1;
-    const quantidade = parseInt(document.getElementById("qtd-item").value);
-    const precoCusto = parseFloat(document.getElementById("preco-custo").value);
-    const precoVenda = parseFloat(document.getElementById("preco-item").value);
+    const quantidade = parseInt(document.getElementById("qtd-item").value) || 0;
+    
+    // Pega o valor e substitui vírgula por ponto para não bugar os centavos
+    const custoStr = document.getElementById("preco-custo").value.replace(',', '.');
+    const vendaStr = document.getElementById("preco-item").value.replace(',', '.');
+    
+    const precoCusto = parseFloat(custoStr) || 0;
+    const precoVenda = parseFloat(vendaStr) || 0;
 
     await fetch('/api/estoque', {
         method: 'POST',
@@ -91,6 +96,47 @@ async function cadastrarItem(e) {
     carregarEstoque();
 }
 
+async function editarItem(id, nome, tipoEmb, unEmb, qtd, custo, venda) {
+    const novoNome = prompt("Novo Nome:", nome);
+    if (novoNome === null) return;
+
+    const novoTipoEmb = prompt("Tipo de Embalagem (Unidade, Fardo, Caixa):", tipoEmb);
+    if (novoTipoEmb === null) return;
+
+    let novaUnEmb = unEmb;
+    if (novoTipoEmb && novoTipoEmb !== 'Unidade') {
+        novaUnEmb = prompt("Quantas unidades vêm no Fardo/Caixa?", unEmb);
+        if (novaUnEmb === null) return;
+    }
+    
+    const novaQtd = prompt("Nova Quantidade:", qtd);
+    if (novaQtd === null) return;
+
+    const novoCustoStr = prompt("Novo Preço de Custo (R$):", custo);
+    if (novoCustoStr === null) return;
+
+    const novoVendaStr = prompt("Novo Preço de Venda Unitário (R$):", venda);
+    if (novoVendaStr === null) return;
+
+    // Converte trocando vírgula por ponto para aceitar formato brasileiro
+    const precoCustoParsed = parseFloat(novoCustoStr.replace(',', '.')) || 0;
+    const precoVendaParsed = parseFloat(novoVendaStr.replace(',', '.')) || 0;
+
+    await fetch(`/api/estoque/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            nome: novoNome, 
+            tipoEmbalagem: novoTipoEmb || 'Unidade',
+            unidadesPorEmbalagem: parseInt(novaUnEmb) || 1,
+            quantidade: parseInt(novaQtd), 
+            precoCusto: precoCustoParsed,
+            precoVenda: precoVendaParsed
+        })
+    });
+    carregarEstoque();
+}
+
 async function zerarEstoque(id) {
     if (confirm("Deseja zerar a quantidade deste produto?")) {
         await fetch(`/api/estoque/${id}/zerar`, { method: 'PATCH' });
@@ -105,35 +151,7 @@ async function excluirItem(id) {
     }
 }
 
-async function editarItem(id, nome, tipoEmb, unEmb, qtd, custo, venda) {
-    const novoNome = prompt("Novo Nome:", nome);
-    const novoTipoEmb = prompt("Tipo de Embalagem (Unidade, Fardo, Caixa):", tipoEmb);
-    let novaUnEmb = unEmb;
-    
-    if (novoTipoEmb && novoTipoEmb !== 'Unidade') {
-        novaUnEmb = prompt("Quantas unidades vêm no Fardo/Caixa?", unEmb);
-    }
-    
-    const novaQtd = prompt("Nova Quantidade:", qtd);
-    const novoCusto = prompt("Novo Preço de Custo (R$):", custo);
-    const novoVenda = prompt("Novo Preço de Venda Unitário (R$):", venda);
 
-    if (novoNome && novaQtd !== null && novoCusto !== null && novoVenda !== null) {
-        await fetch(`/api/estoque/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                nome: novoNome, 
-                tipoEmbalagem: novoTipoEmb || 'Unidade',
-                unidadesPorEmbalagem: parseInt(novaUnEmb) || 1,
-                quantidade: parseInt(novaQtd), 
-                precoCusto: parseFloat(novoCusto),
-                precoVenda: parseFloat(novoVenda)
-            })
-        });
-        carregarEstoque();
-    }
-}
 
 function toggleCamposEmbalagem() {
     const tipo = document.getElementById('tipo-embalagem').value;
