@@ -1,19 +1,35 @@
-let listaFiados = JSON.parse(localStorage.getItem('stockla_fiados')) || [];
+let listaFiados = [];
 
-function cadastrarFiado(e) {
-    e.preventDefault();
-    const nome = document.getElementById("nome-fiado").value;
-    const valor = parseFloat(document.getElementById("valor-fiado").value);
-
-    listaFiados.push({ id: Date.now(), cliente: nome, valor: valor });
-    salvarFiados();
-    document.getElementById("form-fiado").reset();
-    renderizarTabelaFiados();
-    atualizarResumos();
+async function carregarFiados() {
+    try {
+        const res = await fetch('/api/fiados');
+        if (res.ok) {
+            listaFiados = await res.json();
+            renderizarTabelaFiados();
+            atualizarResumos();
+        }
+    } catch (err) {
+        console.error("Erro ao carregar fiados:", err);
+    }
 }
 
-function salvarFiados() {
-    localStorage.setItem('stockla_fiados', JSON.stringify(listaFiados));
+async function cadastrarFiado(e) {
+    e.preventDefault();
+    const cliente = document.getElementById("nome-fiado").value;
+    const valor = parseFloat(document.getElementById("valor-fiado").value);
+
+    const res = await fetch('/api/fiados', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cliente, valor })
+    });
+
+    if (res.ok) {
+        document.getElementById("form-fiado").reset();
+        carregarFiados();
+    } else {
+        alert("Erro ao cadastrar fiado.");
+    }
 }
 
 function renderizarTabelaFiados() {
@@ -35,10 +51,9 @@ function renderizarTabelaFiados() {
             <tr>
                 <td><span class="status-dot ${dotClass}"></span></td>
                 <td><strong>${f.cliente}</strong></td>
-                <td>R$ ${f.valor.toFixed(2)}</td>
+                <td>R$ ${Number(f.valor).toFixed(2)}</td>
                 <td>
-                    <button class="btn-sm btn-edit" onclick="alterarFiado(${f.id}, 10)">+ R$10</button>
-                    <button class="btn-sm btn-zero" onclick="alterarFiado(${f.id}, -10)">- R$10</button>
+                    <button class="btn-sm btn-edit" onclick="editarFiado(${f.id}, '${f.cliente}', ${f.valor})">✏️ Editar</button>
                     <button class="btn-sm btn-delete" onclick="quitarFiado(${f.id})">✅ Quitar</button>
                 </td>
             </tr>
@@ -46,21 +61,31 @@ function renderizarTabelaFiados() {
     });
 }
 
-function alterarFiado(id, delta) {
-    const item = listaFiados.find(f => f.id === id);
-    if (item) {
-        item.valor = Math.max(0, item.valor + delta);
-        salvarFiados();
-        renderizarTabelaFiados();
-        atualizarResumos();
+async function editarFiado(id, clienteAtual, valorAtual) {
+    const novoCliente = prompt("Nome do Cliente:", clienteAtual);
+    const novoValor = prompt("Novo Valor da Dívida (R$):", valorAtual);
+
+    if (novoCliente && novoValor !== null) {
+        await fetch(`/api/fiados/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                cliente: novoCliente, 
+                valor: parseFloat(novoValor) 
+            })
+        });
+        carregarFiados();
     }
 }
 
-function quitarFiado(id) {
+async function quitarFiado(id) {
     if (confirm("Confirmar que o cliente pagou e quitar a conta?")) {
-        listaFiados = listaFiados.filter(f => f.id !== id);
-        salvarFiados();
-        renderizarTabelaFiados();
-        atualizarResumos();
+        await fetch(`/api/fiados/${id}`, { method: 'DELETE' });
+        carregarFiados();
     }
 }
+
+// Carregar os Fiados
+document.addEventListener("DOMContentLoaded", () => {
+    carregarFiados();
+});
