@@ -103,29 +103,41 @@
                         <label>Nome do Produto</label>
                         <input type="text" id="nome-item" list="lista-bebidas-sugeridas" placeholder="Digite ou selecione..." required>
                     </div>
+
                     <div class="form-group">
-                        <label>Embalagem</label>
-                        <select id="tipo-embalagem" class="form-control" style="width:100%; padding: 8px; background:#1e1e1e; color:#fff; border:1px solid #444; border-radius:4px;">
+                        <label>Tipo de Embalagem</label>
+                        <select id="tipo-embalagem" class="form-control" onchange="toggleCamposEmbalagem()" style="width:100%; padding: 8px; background:#1e1e1e; color:#fff; border:1px solid #444; border-radius:4px;">
                             <option value="Unidade">Unidade (Solto)</option>
                             <option value="Fardo">Fardo</option>
                             <option value="Caixa">Caixa</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Quantidade</label>
-                        <input type="number" id="qtd-item" placeholder="0" min="0" required>
+
+                    <!-- Campo que só aparece se for Fardo ou Caixa -->
+                    <div class="form-group" id="bloco-qtd-por-embalagem" style="display: none;">
+                        <label>Quantas unidades vêm no Fardo/Caixa?</label>
+                        <input type="number" id="unidades-por-embalagem" placeholder="Ex: 12 ou 24" min="1" value="12">
                     </div>
+
                     <div class="form-group">
-                        <label>Preço de Custo (R$)</label>
+                        <label>Quantidade (Qtd de Fardos ou Unidades)</label>
+                        <input type="number" id="qtd-item" placeholder="0" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Preço de Custo (Total do Fardo ou Unitário)</label>
                         <input type="number" id="preco-custo" placeholder="0.00" step="0.01" min="0" required>
                     </div>
+
                     <div class="form-group">
-                        <label>Preço de Venda (R$)</label>
+                        <label>Preço de Venda (Unitário)</label>
                         <input type="number" id="preco-item" placeholder="0.00" step="0.01" min="0" required>
                     </div>
-                    <button type="submit" class="btn-add">➕ Adicionar</button>
+
+                    <button type="submit" class="btn-add">➕ Adicionar Produto</button>
                 </form>
             </div>
+
             <div class="box-container table-responsive">
                 <h2>Produtos no Estoque</h2>
                 <table id="tabela-estoque">

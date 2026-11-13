@@ -85,3 +85,13 @@ async function editarItem(id, nome, qtd, preco) {
         carregarEstoque();
     }
 }
+function toggleCamposEmbalagem() {
+    const tipo = document.getElementById('tipo-embalagem').value;
+    const bloco = document.getElementById('bloco-qtd-por-embalagem');
+    
+    if (tipo === 'Fardo' || tipo === 'Caixa') {
+        bloco.style.display = 'block';
+    } else {
+        bloco.style.display = 'none';
+    }
+}
