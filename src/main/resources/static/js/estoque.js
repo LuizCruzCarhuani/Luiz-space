@@ -27,20 +27,24 @@ function renderizarTabelaEstoque() {
     }
 
     listaEstoque.forEach(item => {
+        // Compatibilidade: se for produto antigo usa 'item.preco', se for novo usa 'precoCusto'
+        let custoBase = (item.precoCusto !== undefined && item.precoCusto !== null) ? item.precoCusto : (item.preco || 0);
+        let vendaBase = (item.precoVenda !== undefined && item.precoVenda !== null) ? item.precoVenda : 0;
+
         // Formata o texto da embalagem
         let descEmbalagem = item.tipoEmbalagem || 'Unidade';
         if (descEmbalagem !== 'Unidade' && item.unidadesPorEmbalagem > 1) {
             descEmbalagem += ` (${item.unidadesPorEmbalagem} un)`;
         }
 
-        // Calcula o custo unitário real (se for fardo/caixa, divide o preço total pelas unidades)
-        let custoUnit = item.precoCusto;
+        // Calcula o custo unitário real
+        let custoUnit = custoBase;
         if (item.tipoEmbalagem && item.tipoEmbalagem !== 'Unidade' && item.unidadesPorEmbalagem > 0) {
-            custoUnit = item.precoCusto / item.unidadesPorEmbalagem;
+            custoUnit = custoBase / item.unidadesPorEmbalagem;
         }
 
         // Calcula o lucro unitário estimado
-        let lucroUnit = (item.precoVenda || 0) - custoUnit;
+        let lucroUnit = vendaBase - custoUnit;
 
         tbody.innerHTML += `
             <tr>
@@ -48,10 +52,10 @@ function renderizarTabelaEstoque() {
                 <td>${descEmbalagem}</td>
                 <td>${item.quantidade}</td>
                 <td>R$ ${Number(custoUnit).toFixed(2)}</td>
-                <td>R$ ${Number(item.precoVenda || 0).toFixed(2)}</td>
+                <td>R$ ${Number(vendaBase).toFixed(2)}</td>
                 <td style="color: #2ecc71;">R$ ${Number(lucroUnit).toFixed(2)}</td>
                 <td>
-                    <button class="btn-sm btn-edit" onclick="editarItem(${item.id}, '${item.nome}', '${item.tipoEmbalagem || 'Unidade'}', ${item.unidadesPorEmbalagem || 1}, ${item.quantidade}, ${item.precoCusto || 0}, ${item.precoVenda || 0})">✏️ Editar</button>
+                    <button class="btn-sm btn-edit" onclick="editarItem(${item.id}, '${item.nome}', '${item.tipoEmbalagem || 'Unidade'}', ${item.unidadesPorEmbalagem || 1}, ${item.quantidade}, ${custoBase}, ${vendaBase})">✏️ Editar</button>
                     <button class="btn-sm btn-zero" onclick="zerarEstoque(${item.id})">⚠️ Zerar</button>
                     <button class="btn-sm btn-delete" onclick="excluirItem(${item.id})">🗑️ Excluir</button>
                 </td>
