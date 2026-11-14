@@ -55,7 +55,7 @@ function renderizarTabelaEstoque() {
                 <td>R$ ${Number(vendaBase).toFixed(2)}</td>
                 <td style="color: #2ecc71;">R$ ${Number(lucroUnit).toFixed(2)}</td>
                 <td>
-                    <button class="btn-sm btn-edit" onclick="editarItem(${item.id}, '${item.nome}', '${item.tipoEmbalagem || 'Unidade'}', ${item.unidadesPorEmbalagem || 1}, ${item.quantidade}, ${custoBase}, ${vendaBase})">✏️ Editar</button>
+                    <button class="btn-sm btn-edit" onclick="editarItem(${item.id}, '${item.nome}', '${item.tipoEmbalagem || 'Unidade'}', ${item.unidadesPorEmbalagem || 1}, ${item.quantidade}, '${custoBase}', '${vendaBase}')">✏️ Editar</button>
                     <button class="btn-sm btn-zero" onclick="zerarEstoque(${item.id})">⚠️ Zerar</button>
                     <button class="btn-sm btn-delete" onclick="excluirItem(${item.id})">🗑️ Excluir</button>
                 </td>
