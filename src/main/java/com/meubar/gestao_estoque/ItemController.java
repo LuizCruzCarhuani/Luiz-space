@@ -16,7 +16,7 @@ public class ItemController {
     @Autowired
     private ItemRepository itemRepository;
 
-    // Retorna apenas o estoque do utilizador logado
+    // Retorna apenas o estoque do usuário logado
     @GetMapping
     public List<Item> listarEstoque(HttpSession session) {
         Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
@@ -26,7 +26,7 @@ public class ItemController {
         return itemRepository.findByUsuarioId(usuarioLogado.getId());
     }
 
-    // Salva o item associado ao utilizador logado
+    // Salva o item associado ao usuário logado
     @PostMapping
     public Item salvarItem(@RequestBody Item item, HttpSession session) {
         Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
@@ -34,6 +34,11 @@ public class ItemController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sessão expirada");
         }
         item.setUsuario(usuarioLogado);
+
+        if (item.getPrecoCusto() != null && item.getPreco() == null) {
+            item.setPreco(item.getPrecoCusto());
+        }
+
         return itemRepository.save(item);
     }
 
@@ -43,7 +48,17 @@ public class ItemController {
         return itemRepository.findById(id).map(item -> {
             item.setNome(itemAtualizado.getNome());
             item.setQuantidade(itemAtualizado.getQuantidade());
-            item.setPreco(itemAtualizado.getPreco());
+            item.setTipoEmbalagem(itemAtualizado.getTipoEmbalagem());
+            item.setUnidadesPorEmbalagem(itemAtualizado.getUnidadesPorEmbalagem());
+            item.setPrecoCusto(itemAtualizado.getPrecoCusto());
+            item.setPrecoVenda(itemAtualizado.getPrecoVenda());
+
+            if (itemAtualizado.getPrecoCusto() != null) {
+                item.setPreco(itemAtualizado.getPrecoCusto());
+            } else if (itemAtualizado.getPreco() != null) {
+                item.setPreco(itemAtualizado.getPreco());
+            }
+
             return ResponseEntity.ok(itemRepository.save(item));
         }).orElse(ResponseEntity.notFound().build());
     }

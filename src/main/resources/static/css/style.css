@@ -28,7 +28,17 @@ body { display: flex; background-color: #f4f6f9; color: #333; min-height: 100vh;
 .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)) auto; gap: 12px; align-items: end; }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group label { font-size: 0.85rem; font-weight: 600; color: #555; }
-.form-group input { padding: 9px; border: 1px solid #ccc; border-radius: 6px; font-size: 0.9rem; }
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 9px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background-color: #ffffff;
+    color: #333333;
+    color-scheme: light;
+}
 .btn-add { background-color: #2ecc71; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; }
 
 table { width: 100%; border-collapse: collapse; margin-top: 10px; }
